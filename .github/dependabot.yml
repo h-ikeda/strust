@@ -6,11 +6,15 @@
 
 version: 2
 updates:
- - package-ecosystem: "devcontainers"
-   directory: "/"
+ - package-ecosystem: devcontainers
+   directory: /
    schedule:
      interval: daily
- - package-ecosystem: "rust"
-   directory: "/"
+ - package-ecosystem: cargo
+   directory: /
+   schedule:
+     interval: daily
+ - package-ecosystem: npm
+   directory: /
    schedule:
      interval: daily
