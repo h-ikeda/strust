@@ -1,0 +1,30 @@
+{
+  "name": "strust-app",
+  "version": "0.0.0",
+  "description": "",
+  "source": "src/index.html",
+  "scripts": {
+    "build": "wasm-pack build --no-pack --target=web && parcel build",
+    "start": "wasm-pack build --no-pack --target=web && parcel",
+    "test": "cargo test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/h-ikeda/strust.git"
+  },
+  "author": "IKEDA Hiroki",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/h-ikeda/strust/issues"
+  },
+  "homepage": "https://github.com/h-ikeda/strust#readme",
+  "devDependencies": {
+    "@parcel/transformer-vue": "^2.13.2",
+    "parcel": "^2.13.2",
+    "vue": "^3.5.13",
+    "wasm-pack": "^0.13.1"
+  },
+  "alias": {
+    "strust": "./pkg/strust.js"
+  }
+}
