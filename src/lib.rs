@@ -15,3 +15,13 @@ mod tests {
         assert_eq!(result, 4);
     }
 }
+
+use wasm_bindgen_test::*;
+
+wasm_bindgen_test_configure!(run_in_browser);
+
+#[wasm_bindgen_test]
+fn pass() {
+    let result: u64 = add(3, 5);
+    assert_eq!(result, 8);
+}

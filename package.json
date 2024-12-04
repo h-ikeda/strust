@@ -6,7 +6,7 @@
   "scripts": {
     "build": "wasm-pack build --no-pack --target=web && parcel build",
     "start": "wasm-pack build --no-pack --target=web && parcel",
-    "test": "cargo test"
+    "test": "wasm-pack test --chrome --headless"
   },
   "repository": {
     "type": "git",
