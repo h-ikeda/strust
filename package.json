@@ -5,8 +5,9 @@
   "source": "src/index.html",
   "scripts": {
     "build": "wasm-pack build --no-pack --target=web && parcel build",
-    "start": "wasm-pack build --no-pack --target=web && parcel",
-    "test": "wasm-pack test --chrome --headless"
+    "start": "cargo watch -- wasm-pack build --no-pack --target=web & parcel && kill $!",
+    "test": "wasm-pack test --chrome --headless",
+    "install": "cargo install cargo-watch"
   },
   "repository": {
     "type": "git",
