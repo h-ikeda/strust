@@ -4,8 +4,8 @@
   "description": "",
   "source": "src/index.html",
   "scripts": {
-    "build": "wasm-pack build --no-pack --target=web && parcel build",
-    "start": "cargo watch -- wasm-pack build --no-pack --target=web & parcel && kill $!",
+    "build": "wasm-pack build --no-pack --target=web --out-name=index && parcel build",
+    "start": "cargo watch -- wasm-pack build --no-pack --target=web --out-name=index & parcel && kill $!",
     "test": "wasm-pack test --chrome --headless",
     "install": "cargo install cargo-watch"
   },
@@ -24,8 +24,5 @@
     "parcel": "^2.13.2",
     "vue": "^3.5.13",
     "wasm-pack": "^0.13.1"
-  },
-  "alias": {
-    "strust": "./pkg/strust.js"
   }
 }

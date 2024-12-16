@@ -1,4 +1,4 @@
-import init from 'strust'
+import init from '~/pkg'
 import { createApp } from 'vue'
 import Main from './Main.vue'
 
