@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-      "paths": {
-        "~/*": ["./*"]
-      },
-    "lib": ["ES2020"]
+    "paths": {
+      "#wasm": ["./pkg"]
+    },
+    "lib": ["ES2020"],
+    "resolveJsonModule": true
   }
 }

@@ -1,11 +1,12 @@
 {
   "name": "strust-app",
   "version": "0.0.0",
-  "description": "",
+  "private": true,
+  "description": "Structural calculation tools on browsers.",
   "source": "src/index.html",
   "scripts": {
-    "build": "wasm-pack build --no-pack --target=web --out-name=index && parcel build",
-    "start": "cargo watch -- wasm-pack build --no-pack --target=web --out-name=index & parcel && kill $!",
+    "build": "vite build",
+    "start": "vite",
     "test": "wasm-pack test --chrome --headless",
     "install": "cargo install cargo-watch"
   },
@@ -20,9 +21,18 @@
   },
   "homepage": "https://github.com/h-ikeda/strust#readme",
   "devDependencies": {
-    "@parcel/transformer-vue": "^2.13.2",
-    "parcel": "^2.13.2",
+    "@rollup/plugin-wasm": "^6.2.2",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "sass-embedded": "^1.83.0",
+    "vite": "^6.0.3",
     "vue": "^3.5.13",
+    "vue-router": "^4.5.0",
+    "vuetify": "^3.7.5",
     "wasm-pack": "^0.13.1"
+  },
+  "imports": {
+    "#wasm": {
+      "default": "./pkg"
+    }
   }
 }
