@@ -4,11 +4,11 @@ import { createVuetify } from 'vuetify'
 import { aliases, mdi } from 'vuetify/iconsets/mdi-svg'
 import init from '#wasm'
 import routes from './routes'
-import Main from './Main.vue'
+import StMain from './StMain.vue'
 
 const router = createRouter({
   history: createWebHistory(),
-  routes,
+   routes,
 })
 
 const vuetify = createVuetify({
@@ -22,7 +22,7 @@ const vuetify = createVuetify({
 })
 
 init().then(() => {
-  const app = createApp(Main)
+  const app = createApp(StMain)
   app.use(router)
   app.use(vuetify)
   app.mount('body')

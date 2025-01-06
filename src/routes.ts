@@ -1,11 +1,15 @@
 import { RouteRecordRaw } from "vue-router";
-import Home from "./views/Home.vue";
-import CalculationTools from "./views/CalculationTools.vue";
+import StHome from "./views/StHome.vue";
+import StCalculationTools from "./views/StCalculationTools.vue";
+import StBeam from "./views/calculation-tools/StBeam.vue";
 
 export default [{
   path: '/',
-  component: Home,
+  component: StHome,
 }, {
   path: '/calculation-tools',
-  component: CalculationTools,
+  component: StCalculationTools,
+}, {
+    path: '/calculation-tools/beam',
+    component: StBeam,
 }] as readonly RouteRecordRaw[]
