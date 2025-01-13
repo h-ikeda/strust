@@ -1,4 +1,7 @@
-use super::{traits::Sqrt, vector::Vector};
+use super::{
+    traits::{Cos, Sin, Sqrt},
+    vector::Vector,
+};
 use std::ops::{Add, AddAssign, Div, Mul, Neg, Sub, SubAssign};
 
 #[derive(Debug, Clone, PartialEq)]
@@ -13,18 +16,20 @@ impl<T> Quaternion<T> {
     }
 }
 
-//impl<T> Quaternion<T>
-//where
-//  T: From<u8> + Sin + Cos,
-//for<'a> &'a T: Div<Output = T> + Mul<Output = T>,
-//{
-//  pub fn from_rotation(axis: &Vector<T>, theta: &T) -> Self {
-//    Self {
-//      v: axis * &(theta / &2.into()).sin(),
-//    w: (theta / &2.into()).cos(),
-//  }
-//}
-//}
+impl<T> Quaternion<T>
+where
+    T: From<u8> + Sin + Cos,
+    for<'a> &'a T: Div<Output = T>,
+    for<'a> &'a T: Mul<Output = T>,
+{
+    /// This function needs explicit type specification to be called because of a compiler bug.
+    pub fn from_rotation(axis: &Vector<T>, theta: &T) -> Self {
+        Self {
+            v: axis * &(theta / &2.into()).sin(),
+            w: (theta / &2.into()).cos(),
+        }
+    }
+}
 
 impl<T> Quaternion<T>
 where
@@ -293,12 +298,12 @@ mod tests {
         let a = Quaternion::new(Vector::new(1.3, 0.1, -2.1), -0.8);
         let b = Quaternion::new(Vector::new(0.2, -0.4, 31.1), 0.11);
         assert_eq!(
-            a.abs(),
-            (1.3 * 1.3 + 0.1 * 0.1 + 2.1 * 2.1 + 0.8 * 0.8 as f64).sqrt(),
+            a.abs() as f64,
+            (1.3 * 1.3 + 0.1 * 0.1 + 2.1 * 2.1 + 0.8 * 0.8).sqrt(),
         );
         assert_eq!(
-            b.abs(),
-            (0.2 * 0.2 + 0.4 * 0.4 + 31.1 * 31.1 + 0.11 * 0.11 as f32).sqrt(),
+            b.abs() as f32,
+            (0.2 * 0.2 + 0.4 * 0.4 + 31.1 * 31.1 + 0.11 * 0.11).sqrt(),
         );
     }
 
@@ -355,21 +360,20 @@ mod tests {
         assert_eq!(a.dot(b), 1.3 * 0.2 - 0.1 * 0.4 - 2.1 * 31.1 - 0.8 * 0.11);
     }
 
-    //#[test]
-    //fn from_rotation() {
-    //  Quaternion::from_rotation(&Vector::new(0, 3, 5), &1);
-    //assert_eq!(
-    //  Quaternion::from_rotation(&Vector::new(0.8, 3.2, -1.4), &0.834),
-    //Quaternion::new(
-    //  Vector::new(
-    //    (0.834 / 2.0 as f64).sin() * 0.8,
-    //  (0.834 / 2.0 as f64).sin() * 3.2,
-    //-(0.834 / 2.0 as f64).sin() * 1.4,
-    //       ),
-    //     (0.834 / 2.0 as f64).cos()
-    //)
-    //);
-    // }
+    #[test]
+    fn from_rotation() {
+        assert_eq!(
+            Quaternion::<f64>::from_rotation(&Vector::new(0.8, 3.2, -1.4), &0.834),
+            Quaternion::new(
+                Vector::new(
+                    (0.834 / 2.0).sin() * 0.8,
+                    (0.834 / 2.0).sin() * 3.2,
+                    -(0.834 / 2.0).sin() * 1.4,
+                ),
+                (0.834 / 2.0).cos()
+            )
+        );
+    }
 
     #[test]
     fn from_translation() {

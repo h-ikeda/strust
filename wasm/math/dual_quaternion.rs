@@ -1,5 +1,9 @@
-use super::quaternion::Quaternion;
-use std::ops::{Add, AddAssign, Mul, Neg, Sub, SubAssign};
+use super::{
+    quaternion::Quaternion,
+    traits::{Cos, Sin},
+    vector::Vector,
+};
+use std::ops::{Add, AddAssign, Div, Mul, Neg, Sub, SubAssign};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct DualQuaternion<T> {
@@ -13,37 +17,39 @@ impl<T> DualQuaternion<T> {
     }
 }
 
-//impl<T> DualQuaternion<T>
-//where
-//  T: From<u8> + Clone + Sin + Cos,
-//for<'a> &'a T: Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Div<Output = T>,
-//{
-//  pub fn from_translation_and_rotation(
-//    translation: &Vector<T>,
-//  rotation_axis: &Vector<T>,
-//rotation_theta: &T,
-//    ) -> Self {
-//      let r = Quaternion::from_rotation(rotation_axis, rotation_theta);
-//    let tr = &Quaternion::from_translation(translation) * &r;
-//  Self {
-//    p: r,
-//  q: &tr / &2.into(),
-//     }
-//}
+impl<T> DualQuaternion<T>
+where
+    T: From<u8> + Clone + Sin + Cos,
+    for<'a> &'a T: Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Div<Output = T>,
+{
+    /// This function needs explicit type specification to be called because of a compiler bug.
+    pub fn from_translation_and_rotation(
+        translation: &Vector<T>,
+        rotation_axis: &Vector<T>,
+        rotation_theta: &T,
+    ) -> Self {
+        let r = Quaternion::from_rotation(rotation_axis, rotation_theta);
+        let rt = &r * &Quaternion::from_translation(translation);
+        Self {
+            p: r.into(),
+            q: &rt / &2.into(),
+        }
+    }
 
-//    pub fn from_rotation_and_translation(
-//      rotation_axis: &Vector<T>,
-//    rotation_theta: &T,
-//  translation: &Vector<T>,
-//    ) -> Self {
-//      let r = Quaternion::from_rotation(rotation_axis, rotation_theta);
-//    let rt = &r * &Quaternion::from_translation(translation);
-//  Self {
-//    p: r.into(),
-//  q: &rt / &2.into(),
-//        }
-//  }
-//}
+    /// This function needs explicit type specification to be called because of a compiler bug.
+    pub fn from_rotation_and_translation(
+        rotation_axis: &Vector<T>,
+        rotation_theta: &T,
+        translation: &Vector<T>,
+    ) -> Self {
+        let r = Quaternion::from_rotation(rotation_axis, rotation_theta);
+        let tr = &Quaternion::from_translation(translation) * &r;
+        Self {
+            p: r,
+            q: &tr / &2.into(),
+        }
+    }
+}
 
 impl<T> DualQuaternion<T>
 where
@@ -146,7 +152,6 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::math::vector::Vector;
 
     #[test]
     fn add() {
@@ -398,6 +403,36 @@ mod tests {
                 - 2.2 * 4.9
                 - 64.3 * 6.13
                 - 3.3 * 9.34
+        );
+    }
+
+    #[test]
+    fn from_translation_and_rotation() {
+        assert_eq!(
+            DualQuaternion::<f64>::from_translation_and_rotation(
+                &Vector::new(4.2, 3.1, -10.6),
+                &Vector::new(0.3, -0.4, 0.866),
+                &-0.13,
+            ),
+            DualQuaternion::new(
+                Quaternion::new(Vector::new(3.8, -9.9, -0.84), 3.27),
+                Quaternion::new(Vector::new(-1.2, -2.2, 64.3), 3.3),
+            )
+        );
+    }
+
+    #[test]
+    fn from_rotation_and_translation() {
+        assert_eq!(
+            DualQuaternion::<f64>::from_rotation_and_translation(
+                &Vector::new(0.3, -0.4, 0.866),
+                &-0.13,
+                &Vector::new(4.2, 3.1, -10.6),
+            ),
+            DualQuaternion::new(
+                Quaternion::new(Vector::new(3.8, -9.9, -0.84), 3.27),
+                Quaternion::new(Vector::new(-1.2, -2.2, 64.3), 3.3),
+            )
         );
     }
 }
