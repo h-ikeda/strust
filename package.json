@@ -28,10 +28,10 @@
     "eslint-plugin-vue": "^9.32.0",
     "sass-embedded": "^1.83.0",
     "typescript-eslint": "^8.18.1",
-    "vite": "^6.0.3",
+    "vite": "^6.0.6",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0",
-    "vuetify": "^3.7.5",
+    "vuetify": "^3.7.6",
     "wasm-pack": "^0.13.1"
   },
   "imports": {
