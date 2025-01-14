@@ -1,8 +1,10 @@
+mod math;
+
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
+pub fn multiply(left: f64, right: f64) -> f64 {
+    left * right
 }
 
 #[cfg(test)]
@@ -11,8 +13,8 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+        let result = multiply(2.5, 2.3);
+        assert_eq!(result, 5.75);
     }
 }
 
@@ -22,6 +24,6 @@ wasm_bindgen_test_configure!(run_in_browser);
 
 #[wasm_bindgen_test]
 fn pass() {
-    let result: u64 = add(3, 5);
-    assert_eq!(result, 8);
+    let result = multiply(3.0, 5.0);
+    assert_eq!(result, 15.0);
 }
