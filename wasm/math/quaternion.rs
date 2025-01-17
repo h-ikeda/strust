@@ -6,8 +6,8 @@ use std::ops::{Add, AddAssign, Div, Mul, Neg, Sub, SubAssign};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Quaternion<T> {
-    v: Vector<T>,
-    w: T,
+    pub v: Vector<T>,
+    pub w: T,
 }
 
 impl<T> Quaternion<T> {
@@ -18,15 +18,19 @@ impl<T> Quaternion<T> {
 
 impl<T> Quaternion<T>
 where
-    T: From<u8> + Sin + Cos,
+    T: From<u8> + Sin + Cos + Sqrt,
+    for<'a> &'a T: Add<Output = T>,
     for<'a> &'a T: Div<Output = T>,
     for<'a> &'a T: Mul<Output = T>,
 {
     /// This function needs explicit type specification to be called because of a compiler bug.
-    pub fn from_rotation(axis: &Vector<T>, theta: &T) -> Self {
+    ///
+    /// The `axis` vector's direction is parallel to the rotation axis, and its norm represents the rotation angle.
+    pub fn from_rotation(axis: &Vector<T>) -> Self {
+        let theta = axis.abs();
         Self {
-            v: axis * &(theta / &2.into()).sin(),
-            w: (theta / &2.into()).cos(),
+            v: &(axis / &theta) * &(&theta / &2.into()).sin(),
+            w: (&theta / &2.into()).cos(),
         }
     }
 }
@@ -285,7 +289,7 @@ mod tests {
         let a = &Quaternion::new(Vector::new(1.3, 0.1, -2.1), -0.8);
         assert_eq!(
             a / &2.3,
-            Quaternion::new(Vector::new(1.3 / 2.3, 0.1 / 2.3, -2.1 / 2.3), -0.8 / 2.3),
+            Quaternion::new(&Vector::new(1.3, 0.1, -2.1) / &2.3, -0.8 / 2.3),
         );
         assert_eq!(
             a / &-3.6,
@@ -363,14 +367,17 @@ mod tests {
     #[test]
     fn from_rotation() {
         assert_eq!(
-            Quaternion::<f64>::from_rotation(&Vector::new(0.8, 3.2, -1.4), &0.834),
+            Quaternion::<f64>::from_rotation(&Vector::new(0.8, 3.2, -1.4)),
             Quaternion::new(
                 Vector::new(
-                    (0.834 / 2.0).sin() * 0.8,
-                    (0.834 / 2.0).sin() * 3.2,
-                    -(0.834 / 2.0).sin() * 1.4,
+                    ((0.8 * 0.8 + 3.2 * 3.2 + 1.4 * 1.4).sqrt() / 2.0).sin()
+                        * (0.8 / (0.8 * 0.8 + 3.2 * 3.2 + 1.4 * 1.4).sqrt()),
+                    ((0.8 * 0.8 + 3.2 * 3.2 + 1.4 * 1.4).sqrt() / 2.0).sin()
+                        * (3.2 / (0.8 * 0.8 + 3.2 * 3.2 + 1.4 * 1.4).sqrt()),
+                    -((0.8 * 0.8 + 3.2 * 3.2 + 1.4 * 1.4).sqrt() / 2.0).sin()
+                        * (1.4 / (0.8 * 0.8 + 3.2 * 3.2 + 1.4 * 1.4).sqrt()),
                 ),
-                (0.834 / 2.0).cos()
+                ((0.8 * 0.8 + 3.2 * 3.2 + 1.4 * 1.4).sqrt() / 2.0).cos()
             )
         );
     }

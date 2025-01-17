@@ -1,6 +1,6 @@
 use super::{
     quaternion::Quaternion,
-    traits::{Cos, Sin},
+    traits::{Cos, Sin, Sqrt},
     vector::Vector,
 };
 use std::ops::{Add, AddAssign, Div, Mul, Neg, Sub, SubAssign};
@@ -19,16 +19,15 @@ impl<T> DualQuaternion<T> {
 
 impl<T> DualQuaternion<T>
 where
-    T: From<u8> + Clone + Sin + Cos,
+    T: From<u8> + Clone + Sin + Cos + Sqrt,
     for<'a> &'a T: Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Div<Output = T>,
 {
     /// This function needs explicit type specification to be called because of a compiler bug.
     pub fn from_translation_and_rotation(
         translation: &Vector<T>,
         rotation_axis: &Vector<T>,
-        rotation_theta: &T,
     ) -> Self {
-        let r = Quaternion::from_rotation(rotation_axis, rotation_theta);
+        let r = Quaternion::<T>::from_rotation(rotation_axis);
         let rt = &r * &Quaternion::from_translation(translation);
         Self {
             p: r.into(),
@@ -39,10 +38,9 @@ where
     /// This function needs explicit type specification to be called because of a compiler bug.
     pub fn from_rotation_and_translation(
         rotation_axis: &Vector<T>,
-        rotation_theta: &T,
         translation: &Vector<T>,
     ) -> Self {
-        let r = Quaternion::from_rotation(rotation_axis, rotation_theta);
+        let r = Quaternion::<T>::from_rotation(rotation_axis);
         let tr = &Quaternion::from_translation(translation) * &r;
         Self {
             p: r,
@@ -409,15 +407,16 @@ mod tests {
     #[test]
     fn from_translation_and_rotation() {
         assert_eq!(
-            DualQuaternion::<f64>::from_translation_and_rotation(
+            DualQuaternion::<f32>::from_translation_and_rotation(
                 &Vector::new(4.2, 3.1, -10.6),
-                &Vector::new(0.3, -0.4, 0.866),
-                &-0.13,
+                &Vector::new(0.5, -0.6, 1.8),
             ),
             DualQuaternion::new(
-                Quaternion::new(Vector::new(3.8, -9.9, -0.84), 3.27),
-                Quaternion::new(Vector::new(-1.2, -2.2, 64.3), 3.3),
-            )
+                Quaternion::<f32>::from_rotation(&Vector::new(0.5, -0.6, 1.8)),
+                &(&Quaternion::<f32>::from_rotation(&Vector::new(0.5, -0.6, 1.8))
+                    * &Quaternion::from_translation(&Vector::new(4.2, 3.1, -10.6)))
+                    / &2.0,
+            ),
         );
     }
 
@@ -425,14 +424,15 @@ mod tests {
     fn from_rotation_and_translation() {
         assert_eq!(
             DualQuaternion::<f64>::from_rotation_and_translation(
-                &Vector::new(0.3, -0.4, 0.866),
-                &-0.13,
+                &Vector::new(0.13, -0.24, 0.66),
                 &Vector::new(4.2, 3.1, -10.6),
             ),
             DualQuaternion::new(
-                Quaternion::new(Vector::new(3.8, -9.9, -0.84), 3.27),
-                Quaternion::new(Vector::new(-1.2, -2.2, 64.3), 3.3),
-            )
+                Quaternion::<f64>::from_rotation(&Vector::new(0.13, -0.24, 0.66)),
+                &(&Quaternion::from_translation(&Vector::new(4.2, 3.1, -10.6))
+                    * &Quaternion::<f64>::from_rotation(&Vector::new(0.13, -0.24, 0.66)))
+                    / &2.0,
+            ),
         );
     }
 }
