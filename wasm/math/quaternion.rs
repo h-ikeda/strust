@@ -6,8 +6,8 @@ use std::ops::{Add, AddAssign, Div, Mul, Neg, Sub, SubAssign};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Quaternion<T> {
-    v: Vector<T>,
-    w: T,
+    pub v: Vector<T>,
+    pub w: T,
 }
 
 impl<T> Quaternion<T> {

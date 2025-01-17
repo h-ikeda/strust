@@ -4,9 +4,9 @@ use super::traits::Sqrt;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Vector<T> {
-    x: T,
-    y: T,
-    z: T,
+    pub x: T,
+    pub y: T,
+    pub z: T,
 }
 
 impl<T> Vector<T> {
