@@ -3,7 +3,7 @@ use super::{
     traits::{Cos, Sin, Sqrt},
     vector::Vector,
 };
-use std::ops::{Add, AddAssign, Div, Mul, Neg, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Div, Mul, MulAssign, Neg, Sub, SubAssign};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct DualQuaternion<T> {
@@ -143,6 +143,54 @@ where
         Self::Output {
             p: &self.p * &other.p,
             q: &(&self.p * &other.q) + &(&other.p * &self.q),
+        }
+    }
+}
+
+impl<T> Mul<&T> for &DualQuaternion<T>
+where
+    for<'a> &'a T: Mul<Output = T>,
+{
+    type Output = DualQuaternion<T>;
+
+    fn mul(self, s: &T) -> Self::Output {
+        Self::Output {
+            p: &self.p * s,
+            q: &self.q * s,
+        }
+    }
+}
+
+impl<T> MulAssign<&DualQuaternion<T>> for DualQuaternion<T>
+where
+    for<'a> &'a T: Mul<Output = T> + Add<Output = T> + Sub<Output = T>,
+{
+    fn mul_assign(&mut self, other: &DualQuaternion<T>) {
+        self.q = &(&self.p * &other.q) + &(&other.p * &self.q);
+        self.p *= &other.p;
+    }
+}
+
+impl<T> MulAssign<&T> for DualQuaternion<T>
+where
+    for<'a> T: MulAssign<&'a T>,
+{
+    fn mul_assign(&mut self, s: &T) {
+        self.p *= s;
+        self.q *= s;
+    }
+}
+
+impl<T> Div<&T> for &DualQuaternion<T>
+where
+    for<'a> &'a T: Div<Output = T>,
+{
+    type Output = DualQuaternion<T>;
+
+    fn div(self, s: &T) -> Self::Output {
+        Self::Output {
+            p: &self.p / s,
+            q: &self.q / s,
         }
     }
 }
@@ -351,6 +399,112 @@ mod tests {
                     * &Quaternion::new(Vector::new(3.3, 4.9, -6.13), -9.34))
                     + &(&Quaternion::new(Vector::new(5.3, 3.2, -10.98), 41.2)
                         * &Quaternion::new(Vector::new(-1.2, -2.2, 64.3), 3.3)),
+            ),
+        );
+    }
+
+    #[test]
+    fn mul_scalar() {
+        let a = &DualQuaternion::new(
+            Quaternion::new(Vector::new(3.8, -9.9, -0.84), 3.27),
+            Quaternion::new(Vector::new(-1.2, -2.2, 64.3), 3.3),
+        );
+        let b = &DualQuaternion::new(
+            Quaternion::new(Vector::new(5, 3, -10), 41),
+            Quaternion::new(Vector::new(3, 4, -6), -9),
+        );
+        assert_eq!(
+            a * &3.2,
+            DualQuaternion::new(
+                Quaternion::new(Vector::new(3.8 * 3.2, -9.9 * 3.2, -0.84 * 3.2), 3.27 * 3.2),
+                Quaternion::new(Vector::new(-1.2 * 3.2, -2.2 * 3.2, 64.3 * 3.2), 3.3 * 3.2),
+            ),
+        );
+        assert_eq!(
+            b * &8,
+            DualQuaternion::new(
+                Quaternion::new(Vector::new(40, 24, -80), 328),
+                Quaternion::new(Vector::new(24, 32, -48), -72),
+            ),
+        );
+    }
+
+    #[test]
+    fn mul_assign() {
+        let mut a = DualQuaternion::new(
+            Quaternion::new(Vector::new(3.8, -9.9, -0.84), 3.27),
+            Quaternion::new(Vector::new(-1.2, -2.2, 64.3), 3.3),
+        );
+        let b = DualQuaternion::new(
+            Quaternion::new(Vector::new(5.3, 3.2, -10.98), 41.2),
+            Quaternion::new(Vector::new(3.3, 4.9, -6.13), -9.34),
+        );
+        a *= &b;
+        assert_eq!(
+            a,
+            DualQuaternion::new(
+                &Quaternion::new(Vector::new(3.8, -9.9, -0.84), 3.27)
+                    * &Quaternion::new(Vector::new(5.3, 3.2, -10.98), 41.2),
+                &(&Quaternion::new(Vector::new(3.8, -9.9, -0.84), 3.27)
+                    * &Quaternion::new(Vector::new(3.3, 4.9, -6.13), -9.34))
+                    + &(&Quaternion::new(Vector::new(5.3, 3.2, -10.98), 41.2)
+                        * &Quaternion::new(Vector::new(-1.2, -2.2, 64.3), 3.3)),
+            ),
+        );
+    }
+
+    #[test]
+    fn mul_assign_scalar() {
+        let mut a = DualQuaternion::new(
+            Quaternion::new(Vector::new(3.8, -9.9, -0.84), 3.27),
+            Quaternion::new(Vector::new(-1.2, -2.2, 64.3), 3.3),
+        );
+        a *= &3.2;
+        assert_eq!(
+            a,
+            DualQuaternion::new(
+                Quaternion::new(Vector::new(3.8 * 3.2, -9.9 * 3.2, -0.84 * 3.2), 3.27 * 3.2),
+                Quaternion::new(Vector::new(-1.2 * 3.2, -2.2 * 3.2, 64.3 * 3.2), 3.3 * 3.2),
+            ),
+        );
+        a *= &-8.1;
+        assert_eq!(
+            a,
+            DualQuaternion::new(
+                Quaternion::new(
+                    Vector::new(3.8 * 3.2 * -8.1, -9.9 * 3.2 * -8.1, -0.84 * 3.2 * -8.1),
+                    3.27 * 3.2 * -8.1
+                ),
+                Quaternion::new(
+                    Vector::new(-1.2 * 3.2 * -8.1, -2.2 * 3.2 * -8.1, 64.3 * 3.2 * -8.1),
+                    3.3 * 3.2 * -8.1
+                ),
+            ),
+        );
+    }
+
+    #[test]
+    fn div_scalar() {
+        let a = &DualQuaternion::new(
+            Quaternion::new(Vector::new(3.8, -9.9, -0.84), 3.27),
+            Quaternion::new(Vector::new(-1.2, -2.2, 64.3), 3.3),
+        );
+        let b = &DualQuaternion::new(
+            Quaternion::new(Vector::new(5, 3, -10), 41),
+            Quaternion::new(Vector::new(3, 4, -6), -9),
+        );
+        assert_eq!(
+            a / &3.2,
+            DualQuaternion::new(
+                Quaternion::new(Vector::new(3.8 / 3.2, -9.9 / 3.2, -0.84 / 3.2), 3.27 / 3.2),
+                Quaternion::new(Vector::new(-1.2 / 3.2, -2.2 / 3.2, 64.3 / 3.2), 3.3 / 3.2),
+            ),
+        );
+        assert_eq!(
+            b / &3,
+            DualQuaternion::new(
+                Quaternion::new(Vector::new(1, 1, -3), 13),
+                Quaternion::new(Vector::new(1, 1, -2), -3),
             ),
         );
     }
