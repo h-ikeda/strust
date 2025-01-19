@@ -147,6 +147,20 @@ where
     }
 }
 
+impl<T> Mul<&T> for &DualQuaternion<T>
+where
+    for<'a> &'a T: Mul<Output = T>,
+{
+    type Output = DualQuaternion<T>;
+
+    fn mul(self, s: &T) -> Self::Output {
+        Self::Output {
+            p: &self.p * s,
+            q: &self.q * s,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -351,6 +365,32 @@ mod tests {
                     * &Quaternion::new(Vector::new(3.3, 4.9, -6.13), -9.34))
                     + &(&Quaternion::new(Vector::new(5.3, 3.2, -10.98), 41.2)
                         * &Quaternion::new(Vector::new(-1.2, -2.2, 64.3), 3.3)),
+            ),
+        );
+    }
+
+    #[test]
+    fn mul_scalar() {
+        let a = &DualQuaternion::new(
+            Quaternion::new(Vector::new(3.8, -9.9, -0.84), 3.27),
+            Quaternion::new(Vector::new(-1.2, -2.2, 64.3), 3.3),
+        );
+        let b = &DualQuaternion::new(
+            Quaternion::new(Vector::new(5, 3, -10), 41),
+            Quaternion::new(Vector::new(3, 4, -6), -9),
+        );
+        assert_eq!(
+            a * &3.2,
+            DualQuaternion::new(
+                Quaternion::new(Vector::new(3.8 * 3.2, -9.9 * 3.2, -0.84 * 3.2), 3.27 * 3.2),
+                Quaternion::new(Vector::new(-1.2 * 3.2, -2.2 * 3.2, 64.3 * 3.2), 3.3 * 3.2),
+            ),
+        );
+        assert_eq!(
+            b * &8,
+            DualQuaternion::new(
+                Quaternion::new(Vector::new(40, 24, -80), 328),
+                Quaternion::new(Vector::new(24, 32, -48), -72),
             ),
         );
     }
