@@ -161,6 +161,20 @@ where
     }
 }
 
+impl<T> Div<&T> for &DualQuaternion<T>
+where
+    for<'a> &'a T: Div<Output = T>,
+{
+    type Output = DualQuaternion<T>;
+
+    fn div(self, s: &T) -> Self::Output {
+        Self::Output {
+            p: &self.p / s,
+            q: &self.q / s,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -391,6 +405,32 @@ mod tests {
             DualQuaternion::new(
                 Quaternion::new(Vector::new(40, 24, -80), 328),
                 Quaternion::new(Vector::new(24, 32, -48), -72),
+            ),
+        );
+    }
+
+    #[test]
+    fn div_scalar() {
+        let a = &DualQuaternion::new(
+            Quaternion::new(Vector::new(3.8, -9.9, -0.84), 3.27),
+            Quaternion::new(Vector::new(-1.2, -2.2, 64.3), 3.3),
+        );
+        let b = &DualQuaternion::new(
+            Quaternion::new(Vector::new(5, 3, -10), 41),
+            Quaternion::new(Vector::new(3, 4, -6), -9),
+        );
+        assert_eq!(
+            a / &3.2,
+            DualQuaternion::new(
+                Quaternion::new(Vector::new(3.8 / 3.2, -9.9 / 3.2, -0.84 / 3.2), 3.27 / 3.2),
+                Quaternion::new(Vector::new(-1.2 / 3.2, -2.2 / 3.2, 64.3 / 3.2), 3.3 / 3.2),
+            ),
+        );
+        assert_eq!(
+            b / &3,
+            DualQuaternion::new(
+                Quaternion::new(Vector::new(1, 1, -3), 13),
+                Quaternion::new(Vector::new(1, 1, -2), -3),
             ),
         );
     }
