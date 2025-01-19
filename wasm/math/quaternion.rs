@@ -2,7 +2,7 @@ use super::{
     traits::{Cos, Sin, Sqrt},
     vector::Vector,
 };
-use std::ops::{Add, AddAssign, Div, Mul, Neg, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Div, Mul, MulAssign, Neg, Sub, SubAssign};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Quaternion<T> {
@@ -188,6 +188,17 @@ where
     }
 }
 
+impl<T> MulAssign<&Quaternion<T>> for Quaternion<T>
+where
+    for<'a> &'a T: Mul<Output = T> + Add<Output = T> + Sub<Output = T>,
+{
+    fn mul_assign(&mut self, other: &Quaternion<T>) {
+        let w = &(&self.w * &other.w) - &self.v.dot(&other.v);
+        self.v = &(&(&self.v * &other.w) + &(&other.v * &self.w)) + &(&self.v * &other.v);
+        self.w = w;
+    }
+}
+
 impl<T> Div<&T> for &Quaternion<T>
 where
     for<'a> &'a T: Div<Output = T>,
@@ -281,6 +292,24 @@ mod tests {
         assert_eq!(
             a * &-3.6,
             Quaternion::new(Vector::new(-1.3 * 3.6, -0.1 * 3.6, 2.1 * 3.6), 0.8 * 3.6),
+        );
+    }
+
+    #[test]
+    fn mul_assign() {
+        let mut a = Quaternion::new(Vector::new(1.3, 0.1, -2.1), -0.8);
+        let b = Quaternion::new(Vector::new(0.2, -0.4, 31.1), 0.11);
+        a *= &b;
+        assert_eq!(
+            a,
+            Quaternion::new(
+                Vector::new(
+                    0.11 * 1.3 - 0.8 * 0.2 + (0.1 * 31.1 - 2.1 * 0.4),
+                    0.11 * 0.1 + 0.8 * 0.4 + (-2.1 * 0.2 - 1.3 * 31.1),
+                    -0.11 * 2.1 - 0.8 * 31.1 + (-1.3 * 0.4 - 0.1 * 0.2),
+                ),
+                -0.8 * 0.11 - (1.3 * 0.2 - 0.1 * 0.4 - 2.1 * 31.1),
+            )
         );
     }
 
