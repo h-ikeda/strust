@@ -1,4 +1,4 @@
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, Neg, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 use super::traits::Sqrt;
 
@@ -138,6 +138,19 @@ where
             y: &self.y * s,
             z: &self.z * s,
         }
+    }
+}
+
+impl<T> MulAssign<&Vector<T>> for Vector<T>
+where
+    for<'a> &'a T: Mul<&'a T, Output = T> + Sub<&'a T, Output = T>,
+{
+    fn mul_assign(&mut self, other: &Vector<T>) {
+        let y = &(&self.z * &other.x) - &(&self.x * &other.z);
+        let z = &(&self.x * &other.y) - &(&self.y * &other.x);
+        self.x = &(&self.y * &other.z) - &(&self.z * &other.y);
+        self.y = y;
+        self.z = z;
     }
 }
 
@@ -333,6 +346,48 @@ mod tests {
         assert_eq!(
             c * a,
             Vector::new(9 * 30 - 99 * 15, -99 * 3 + 511 * 30, 511 * 15 - 9 * 3)
+        );
+    }
+
+    #[test]
+    fn mul_assign_float_vector() {
+        let mut a = Vector::new(-1.3, 0.15, -30.8);
+        let mut b = Vector::new(-20.4, -3.8, 11.3);
+        let c = Vector::new(511.35, -2.9, 99.2);
+        a *= &b;
+        assert_eq!(
+            a,
+            Vector::new(
+                0.15 * 11.3 - 30.8 * 3.8,
+                30.8 * 20.4 + 1.3 * 11.3,
+                1.3 * 3.8 + 0.15 * 20.4
+            )
+        );
+        b *= &c;
+        assert_eq!(
+            b,
+            Vector::new(
+                -3.8 * 99.2 + 11.3 * 2.9,
+                11.3 * 511.35 + 20.4 * 99.2,
+                20.4 * 2.9 + 3.8 * 511.35
+            )
+        );
+    }
+
+    #[test]
+    fn mul_assign_int_vector() {
+        let mut a = Vector::new(-3, 15, -30);
+        let mut b = Vector::new(-20, -3, 11);
+        let c = Vector::new(511, -9, 99);
+        a *= &b;
+        assert_eq!(
+            a,
+            Vector::new(15 * 11 - 30 * 3, 30 * 20 + 3 * 11, 3 * 3 + 15 * 20)
+        );
+        b *= &c;
+        assert_eq!(
+            b,
+            Vector::new(-3 * 99 + 11 * 9, 11 * 511 + 20 * 99, 20 * 9 + 3 * 511)
         );
     }
 
