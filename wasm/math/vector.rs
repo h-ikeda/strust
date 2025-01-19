@@ -154,6 +154,17 @@ where
     }
 }
 
+impl<T> MulAssign<&T> for Vector<T>
+where
+    for<'a> T: MulAssign<&'a T>,
+{
+    fn mul_assign(&mut self, s: &T) {
+        self.x *= s;
+        self.y *= s;
+        self.z *= s;
+    }
+}
+
 impl<T> Div<&T> for &Vector<T>
 where
     for<'a> &'a T: Div<Output = T>,
@@ -297,6 +308,20 @@ mod tests {
     fn mul_int() {
         let a = Vector::new(-1, 15, -30);
         assert_eq!(&a * &3, Vector::new(-3, 45, -90));
+    }
+
+    #[test]
+    fn mul_assign_float() {
+        let mut a = Vector::new(-1.3, 0.15, -30.8);
+        a *= &3.8;
+        assert_eq!(a, Vector::new(-1.3 * 3.8, 0.15 * 3.8, -30.8 * 3.8));
+    }
+
+    #[test]
+    fn mul_assign_int() {
+        let mut a = Vector::new(-1, 15, -30);
+        a *= &3;
+        assert_eq!(a, Vector::new(-3, 45, -90));
     }
 
     #[test]
