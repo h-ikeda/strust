@@ -199,6 +199,16 @@ where
     }
 }
 
+impl<T> MulAssign<&T> for Quaternion<T>
+where
+    for<'a> T: MulAssign<&'a T>,
+{
+    fn mul_assign(&mut self, s: &T) {
+        self.v *= s;
+        self.w *= s;
+    }
+}
+
 impl<T> Div<&T> for &Quaternion<T>
 where
     for<'a> &'a T: Div<Output = T>,
@@ -310,6 +320,24 @@ mod tests {
                 ),
                 -0.8 * 0.11 - (1.3 * 0.2 - 0.1 * 0.4 - 2.1 * 31.1),
             )
+        );
+    }
+
+    #[test]
+    fn mul_assign_scalar() {
+        let mut a = Quaternion::new(Vector::new(1.3, 0.1, -2.1), -0.8);
+        a *= &2.3;
+        assert_eq!(
+            a,
+            Quaternion::new(&Vector::new(1.3, 0.1, -2.1) * &2.3, -0.8 * 2.3),
+        );
+        a *= &-3.6;
+        assert_eq!(
+            a,
+            Quaternion::new(
+                &(&Vector::new(-1.3, -0.1, 2.1) * &2.3) * &3.6,
+                0.8 * 2.3 * 3.6
+            ),
         );
     }
 
