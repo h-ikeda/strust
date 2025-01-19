@@ -18,7 +18,7 @@ impl<T> Quaternion<T> {
 
 impl<T> Quaternion<T>
 where
-    T: From<u8> + Sin + Cos + Sqrt,
+    T: From<u8> + Sin + Cos + Sqrt + PartialOrd,
     for<'a> &'a T: Add<Output = T>,
     for<'a> &'a T: Div<Output = T>,
     for<'a> &'a T: Mul<Output = T>,
@@ -27,10 +27,15 @@ where
     ///
     /// The `axis` vector's direction is parallel to the rotation axis, and its norm represents the rotation angle.
     pub fn from_rotation(axis: &Vector<T>) -> Self {
-        let theta = axis.abs();
-        Self {
-            v: &(axis / &theta) * &(&theta / &2.into()).sin(),
-            w: (&theta / &2.into()).cos(),
+        match axis.abs() {
+            theta if theta > 0.into() => Self {
+                v: &(axis / &theta) * &(&theta / &2.into()).sin(),
+                w: (&theta / &2.into()).cos(),
+            },
+            theta => Self {
+                v: axis * &theta,
+                w: theta.cos(),
+            },
         }
     }
 }
@@ -464,6 +469,14 @@ mod tests {
                 ),
                 ((0.8 * 0.8 + 3.2 * 3.2 + 1.4 * 1.4).sqrt() / 2.0).cos()
             )
+        );
+        assert_eq!(
+            Quaternion::<f32>::from_rotation(&Vector::new(0.0, 0.0, 0.0)),
+            Quaternion::new(Vector::new(0.0, 0.0, 0.0), 1.0),
+        );
+        assert_eq!(
+            Quaternion::<f32>::from_rotation(&Vector::new(2.2e-218, 1.3e-301, 9.0e-278)),
+            Quaternion::new(Vector::new(0.0, 0.0, 0.0), 1.0),
         );
     }
 

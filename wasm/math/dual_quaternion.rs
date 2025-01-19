@@ -19,7 +19,7 @@ impl<T> DualQuaternion<T> {
 
 impl<T> DualQuaternion<T>
 where
-    T: From<u8> + Clone + Sin + Cos + Sqrt,
+    T: From<u8> + Clone + Sin + Cos + Sqrt + PartialOrd,
     for<'a> &'a T: Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Div<Output = T>,
 {
     /// This function needs explicit type specification to be called because of a compiler bug.
