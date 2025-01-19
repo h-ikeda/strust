@@ -2,7 +2,7 @@ use super::{
     traits::{Cos, Sin, Sqrt},
     vector::Vector,
 };
-use std::ops::{Add, AddAssign, Div, Mul, MulAssign, Neg, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Quaternion<T> {
@@ -223,6 +223,16 @@ where
     }
 }
 
+impl<T> DivAssign<&T> for Quaternion<T>
+where
+    for<'a> T: DivAssign<&'a T>,
+{
+    fn div_assign(&mut self, s: &T) {
+        self.v /= s;
+        self.w /= s;
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -351,6 +361,24 @@ mod tests {
         assert_eq!(
             a / &-3.6,
             Quaternion::new(Vector::new(-1.3 / 3.6, -0.1 / 3.6, 2.1 / 3.6), 0.8 / 3.6),
+        );
+    }
+
+    #[test]
+    fn div_assign() {
+        let mut a = Quaternion::new(Vector::new(1.3, 0.1, -2.1), -0.8);
+        a /= &2.3;
+        assert_eq!(
+            a,
+            Quaternion::new(&Vector::new(1.3, 0.1, -2.1) / &2.3, -0.8 / 2.3),
+        );
+        a /= &-3.6;
+        assert_eq!(
+            a,
+            Quaternion::new(
+                Vector::new(-1.3 / 2.3 / 3.6, -0.1 / 2.3 / 3.6, 2.1 / 2.3 / 3.6),
+                0.8 / 2.3 / 3.6
+            ),
         );
     }
 
