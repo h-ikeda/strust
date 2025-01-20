@@ -1,5 +1,5 @@
 use super::{
-    traits::{Cos, Sin, Sqrt},
+    traits::{Cos, Hypot, Sin},
     vector::Vector,
 };
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
@@ -18,7 +18,7 @@ impl<T> Quaternion<T> {
 
 impl<T> Quaternion<T>
 where
-    T: From<u8> + Sin + Cos + Sqrt + PartialOrd,
+    T: From<u8> + Sin + Cos + Hypot + PartialOrd,
     for<'a> &'a T: Add<Output = T>,
     for<'a> &'a T: Div<Output = T>,
     for<'a> &'a T: Mul<Output = T>,
@@ -64,17 +64,17 @@ where
 impl<T> Quaternion<T>
 where
     for<'a> &'a T: Add<Output = T> + Mul<Output = T>,
-    T: Sqrt,
+    T: Hypot,
 {
     pub fn abs(&self) -> T {
-        self.dot(self).sqrt()
+        self.v.abs().hypot(&self.w)
     }
 }
 
 impl<T> Quaternion<T>
 where
     for<'a> &'a T: Add<Output = T> + Mul<Output = T> + Div<Output = T>,
-    T: Sqrt,
+    T: Hypot,
 {
     pub fn normalized(&self) -> Self {
         self / &self.abs()
@@ -391,29 +391,35 @@ mod tests {
     fn abs() {
         let a = Quaternion::new(Vector::new(1.3, 0.1, -2.1), -0.8);
         let b = Quaternion::new(Vector::new(0.2, -0.4, 31.1), 0.11);
-        assert_eq!(
-            a.abs() as f64,
-            (1.3 * 1.3 + 0.1 * 0.1 + 2.1 * 2.1 + 0.8 * 0.8).sqrt(),
-        );
-        assert_eq!(
-            b.abs() as f32,
-            (0.2 * 0.2 + 0.4 * 0.4 + 31.1 * 31.1 + 0.11 * 0.11).sqrt(),
-        );
+        assert_eq!(a.abs(), (1.3 as f64).hypot(0.1).hypot(2.1).hypot(0.8));
+        assert_eq!(b.abs(), (0.2 as f32).hypot(0.4).hypot(31.1).hypot(0.11));
     }
 
     #[test]
     fn normalized() {
         let a = Quaternion::new(Vector::new(1.3, 0.1, -2.1), -0.8);
         let b = Quaternion::new(Vector::new(0.2, -0.4, 31.1), 0.11);
-        let ta = (1.3 * 1.3 + 0.1 * 0.1 + 2.1 * 2.1 + 0.8 * 0.8 as f64).sqrt();
-        let tb = (0.2 * 0.2 + 0.4 * 0.4 + 31.1 * 31.1 + 0.11 * 0.11 as f32).sqrt();
         assert_eq!(
             a.normalized(),
-            Quaternion::new(Vector::new(1.3 / ta, 0.1 / ta, -2.1 / ta), -0.8 / ta),
+            Quaternion::new(
+                Vector::new(
+                    1.3 / (1.3 as f64).hypot(0.1).hypot(2.1).hypot(0.8),
+                    0.1 / (1.3 as f64).hypot(0.1).hypot(2.1).hypot(0.8),
+                    -2.1 / (1.3 as f64).hypot(0.1).hypot(2.1).hypot(0.8)
+                ),
+                -0.8 / (1.3 as f64).hypot(0.1).hypot(2.1).hypot(0.8)
+            ),
         );
         assert_eq!(
             b.normalized(),
-            Quaternion::new(Vector::new(0.2 / tb, -0.4 / tb, 31.1 / tb), 0.11 / tb),
+            Quaternion::new(
+                Vector::new(
+                    0.2 / (0.2 as f32).hypot(0.4).hypot(31.1).hypot(0.11),
+                    -0.4 / (0.2 as f32).hypot(0.4).hypot(31.1).hypot(0.11),
+                    31.1 / (0.2 as f32).hypot(0.4).hypot(31.1).hypot(0.11)
+                ),
+                0.11 / (0.2 as f32).hypot(0.4).hypot(31.1).hypot(0.11)
+            ),
         );
     }
 
@@ -460,14 +466,14 @@ mod tests {
             Quaternion::<f64>::from_rotation(&Vector::new(0.8, 3.2, -1.4)),
             Quaternion::new(
                 Vector::new(
-                    ((0.8 * 0.8 + 3.2 * 3.2 + 1.4 * 1.4).sqrt() / 2.0).sin()
-                        * (0.8 / (0.8 * 0.8 + 3.2 * 3.2 + 1.4 * 1.4).sqrt()),
-                    ((0.8 * 0.8 + 3.2 * 3.2 + 1.4 * 1.4).sqrt() / 2.0).sin()
-                        * (3.2 / (0.8 * 0.8 + 3.2 * 3.2 + 1.4 * 1.4).sqrt()),
-                    -((0.8 * 0.8 + 3.2 * 3.2 + 1.4 * 1.4).sqrt() / 2.0).sin()
-                        * (1.4 / (0.8 * 0.8 + 3.2 * 3.2 + 1.4 * 1.4).sqrt()),
+                    ((0.8 as f64).hypot(3.2).hypot(1.4) / 2.0).sin()
+                        * (0.8 / (0.8 as f64).hypot(3.2).hypot(1.4)),
+                    ((0.8 as f64).hypot(3.2).hypot(1.4) / 2.0).sin()
+                        * (3.2 / (0.8 as f64).hypot(3.2).hypot(1.4)),
+                    -((0.8 as f64).hypot(3.2).hypot(1.4) / 2.0).sin()
+                        * (1.4 / (0.8 as f64).hypot(3.2).hypot(1.4)),
                 ),
-                ((0.8 * 0.8 + 3.2 * 3.2 + 1.4 * 1.4).sqrt() / 2.0).cos()
+                ((0.8 as f64).hypot(3.2).hypot(1.4) / 2.0).cos()
             )
         );
         assert_eq!(

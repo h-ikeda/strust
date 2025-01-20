@@ -1,6 +1,6 @@
 use super::{
     quaternion::Quaternion,
-    traits::{Cos, Sin, Sqrt},
+    traits::{Cos, Hypot, Sin},
     vector::Vector,
 };
 use std::ops::{Add, AddAssign, Div, Mul, MulAssign, Neg, Sub, SubAssign};
@@ -19,7 +19,7 @@ impl<T> DualQuaternion<T> {
 
 impl<T> DualQuaternion<T>
 where
-    T: From<u8> + Clone + Sin + Cos + Sqrt + PartialOrd,
+    T: From<u8> + Clone + Sin + Cos + Hypot + PartialOrd,
     for<'a> &'a T: Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Div<Output = T>,
 {
     /// This function needs explicit type specification to be called because of a compiler bug.
