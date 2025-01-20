@@ -85,6 +85,16 @@ where
     }
 }
 
+impl<T> DualQuaternion<T>
+where
+    T: From<u8> + Clone,
+    for<'a> &'a T: Neg<Output = T> + Add<Output = T> + Mul<Output = T> + Sub<Output = T>,
+{
+    pub fn translation(&self) -> Vector<T> {
+        &(&self.q * &self.p.conj()).v * &<u8 as Into<T>>::into(2)
+    }
+}
+
 impl<T> Add for &DualQuaternion<T>
 where
     for<'a> &'a T: Add<Output = T>,
@@ -588,5 +598,21 @@ mod tests {
                     / &2.0,
             ),
         );
+    }
+
+    #[test]
+    fn translation() {
+        let a = DualQuaternion::<f64>::from_rotation_and_translation(
+            &Vector::new(0.0, 0.0, 0.0),
+            &Vector::new(32.8, -6.35, -9.97),
+        );
+        assert_eq!(a.translation(), Vector::new(32.8, -6.35, -9.97));
+        let b = DualQuaternion::<f64>::from_rotation_and_translation(
+            &Vector::new(0.0, 0.001, 0.008),
+            &Vector::new(32.8, -6.35, -9.97),
+        );
+        assert!((b.translation().x - 32.8).abs() < f64::EPSILON * 32.8);
+        assert!((b.translation().y + 6.35).abs() < f64::EPSILON * 6.35);
+        assert!((b.translation().z + 9.97).abs() < f64::EPSILON * 9.97);
     }
 }
