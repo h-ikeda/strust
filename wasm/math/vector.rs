@@ -1,6 +1,6 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
-use super::traits::Sqrt;
+use super::traits::Hypot;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Vector<T> {
@@ -27,17 +27,17 @@ where
 impl<T> Vector<T>
 where
     for<'a> &'a T: Mul<Output = T> + Add<Output = T>,
-    T: Sqrt,
+    T: Hypot,
 {
     pub fn abs(&self) -> T {
-        self.dot(self).sqrt()
+        self.x.hypot(&self.y).hypot(&self.z)
     }
 }
 
 impl<T> Vector<T>
 where
     for<'a> &'a T: Mul<Output = T> + Add<Output = T> + Div<Output = T>,
-    T: Sqrt,
+    T: Hypot,
 {
     pub fn normalized(&self) -> Self {
         self / &self.abs()
@@ -448,33 +448,30 @@ mod tests {
         let a = Vector::new(-1.3, 0.15, -30.8);
         let b = Vector::new(-20.4, -3.8, 11.3);
         let c = Vector::new(511.35, -2.9, 99.2);
-        assert_eq!(
-            a.abs(),
-            (1.3 * 1.3 + 0.15 * 0.15 + 30.8 * 30.8 as f64).sqrt()
-        );
-        assert_eq!(
-            b.abs(),
-            (20.4 * 20.4 + 3.8 * 3.8 + 11.3 * 11.3 as f32).sqrt()
-        );
-        assert_eq!(
-            c.abs(),
-            (511.35 * 511.35 + 2.9 * 2.9 + 99.2 * 99.2 as f64).sqrt()
-        );
+        assert_eq!(a.abs(), (1.3 as f64).hypot(0.15).hypot(30.8));
+        assert_eq!(b.abs(), (20.4 as f32).hypot(3.8).hypot(11.3));
+        assert_eq!(c.abs(), (511.35 as f64).hypot(2.9).hypot(99.2));
     }
 
     #[test]
     fn normalized() {
         let a = Vector::new(-1.3, 0.15, -30.8);
         let b = Vector::new(-20.4, -3.8, 11.3);
-        let ta = (1.3 * 1.3 + 0.15 * 0.15 + 30.8 * 30.8 as f64).sqrt();
-        let tb = (20.4 * 20.4 + 3.8 * 3.8 + 11.3 * 11.3 as f64).sqrt();
         assert_eq!(
             a.normalized(),
-            Vector::new(-1.3 / ta, 0.15 / ta, -30.8 / ta)
+            Vector::new(
+                -1.3 / (1.3 as f64).hypot(0.15).hypot(30.8),
+                0.15 / (1.3 as f64).hypot(0.15).hypot(30.8),
+                -30.8 / (1.3 as f64).hypot(0.15).hypot(30.8)
+            )
         );
         assert_eq!(
             b.normalized(),
-            Vector::new(-20.4 / tb, -3.8 / tb, 11.3 / tb)
+            Vector::new(
+                -20.4 / (20.4 as f32).hypot(3.8).hypot(11.3),
+                -3.8 / (20.4 as f32).hypot(3.8).hypot(11.3),
+                11.3 / (20.4 as f32).hypot(3.8).hypot(11.3)
+            )
         );
     }
 }

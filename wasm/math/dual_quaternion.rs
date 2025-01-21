@@ -1,6 +1,6 @@
 use super::{
     quaternion::Quaternion,
-    traits::{Cos, Sin, Sqrt},
+    traits::{Cos, Hypot, Sin},
     vector::Vector,
 };
 use std::ops::{Add, AddAssign, Div, Mul, MulAssign, Neg, Sub, SubAssign};
@@ -19,7 +19,7 @@ impl<T> DualQuaternion<T> {
 
 impl<T> DualQuaternion<T>
 where
-    T: From<u8> + Clone + Sin + Cos + Sqrt,
+    T: From<u8> + Clone + Sin + Cos + Hypot + PartialOrd,
     for<'a> &'a T: Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Div<Output = T>,
 {
     /// This function needs explicit type specification to be called because of a compiler bug.
@@ -82,6 +82,16 @@ where
 {
     pub fn dot(&self, other: &Self) -> T {
         &self.p.dot(&other.p) + &self.q.dot(&other.q)
+    }
+}
+
+impl<T> DualQuaternion<T>
+where
+    T: From<u8> + Clone,
+    for<'a> &'a T: Neg<Output = T> + Add<Output = T> + Mul<Output = T> + Sub<Output = T>,
+{
+    pub fn translation(&self) -> Vector<T> {
+        &(&self.q * &self.p.conj()).v * &T::from(2)
     }
 }
 
@@ -588,5 +598,21 @@ mod tests {
                     / &2.0,
             ),
         );
+    }
+
+    #[test]
+    fn translation() {
+        let a = DualQuaternion::<f64>::from_rotation_and_translation(
+            &Vector::new(0.0, 0.0, 0.0),
+            &Vector::new(32.8, -6.35, -9.97),
+        );
+        assert_eq!(a.translation(), Vector::new(32.8, -6.35, -9.97));
+        let b = DualQuaternion::<f64>::from_rotation_and_translation(
+            &Vector::new(0.0, 0.001, 0.008),
+            &Vector::new(32.8, -6.35, -9.97),
+        );
+        assert!((b.translation().x - 32.8).abs() < f64::EPSILON * 32.8);
+        assert!((b.translation().y + 6.35).abs() < f64::EPSILON * 6.35);
+        assert!((b.translation().z + 9.97).abs() < f64::EPSILON * 9.97);
     }
 }
