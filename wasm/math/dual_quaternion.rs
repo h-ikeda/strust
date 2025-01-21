@@ -91,7 +91,7 @@ where
     for<'a> &'a T: Neg<Output = T> + Add<Output = T> + Mul<Output = T> + Sub<Output = T>,
 {
     pub fn translation(&self) -> Vector<T> {
-        &(&self.q * &self.p.conj()).v * &<u8 as Into<T>>::into(2)
+        &(&self.q * &self.p.conj()).v * &T::from(2)
     }
 }
 
