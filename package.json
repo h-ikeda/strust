@@ -7,8 +7,8 @@
   "scripts": {
     "build": "vite build",
     "start": "vite",
-    "test": "cargo test && wasm-pack test --chrome --headless",
-    "lint": "cargo fmt --check && eslint"
+    "test": "wasm-pack test --chrome --headless",
+    "lint": "eslint"
   },
   "repository": {
     "type": "git",

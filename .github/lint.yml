@@ -1,4 +1,4 @@
-name: Tests
+name: Lints
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branched: ["main"]
 
 jobs:
-  npm test:
+  npm lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -15,10 +15,10 @@ jobs:
         with:
           node-version: '22.x'
       - run: npm ci
-      - run: npm test
+      - run: npm lint
 
-  cargo test:
+  cargo fmt:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: cargo test
+      - run: cargo fmt --check
