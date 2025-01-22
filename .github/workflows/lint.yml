@@ -15,7 +15,7 @@ jobs:
         with:
           node-version: '22.x'
       - run: npm ci
-      - run: npm lint
+      - run: npm run lint
 
   cargo_fmt:
     runs-on: ubuntu-latest
