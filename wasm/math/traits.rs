@@ -45,3 +45,51 @@ impl Hypot for f64 {
         (*self).hypot(*other)
     }
 }
+
+pub trait Exp {
+    fn exp(&self) -> Self;
+}
+
+impl Exp for f32 {
+    fn exp(&self) -> Self {
+        (*self).exp()
+    }
+}
+
+impl Exp for f64 {
+    fn exp(&self) -> Self {
+        (*self).exp()
+    }
+}
+
+pub trait Atan2 {
+    fn atan2(&self, other: &Self) -> Self;
+}
+
+impl Atan2 for f32 {
+    fn atan2(&self, other: &Self) -> Self {
+        (*self).atan2(*other)
+    }
+}
+
+impl Atan2 for f64 {
+    fn atan2(&self, other: &Self) -> Self {
+        (*self).atan2(*other)
+    }
+}
+
+pub trait Ln {
+    fn ln(&self) -> Self;
+}
+
+impl Ln for f32 {
+    fn ln(&self) -> Self {
+        (*self).ln()
+    }
+}
+
+impl Ln for f64 {
+    fn ln(&self) -> Self {
+        (*self).ln()
+    }
+}
