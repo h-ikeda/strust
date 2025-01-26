@@ -17,6 +17,18 @@ impl<T> DualQuaternion<T> {
     }
 }
 
+impl<T> From<T> for DualQuaternion<T>
+where
+    T: From<u8>,
+{
+    fn from(value: T) -> Self {
+        Self {
+            p: value.into(),
+            q: T::from(0).into(),
+        }
+    }
+}
+
 impl<T> DualQuaternion<T>
 where
     T: From<u8> + Clone + Sin + Cos + Hypot + PartialOrd,
@@ -208,6 +220,24 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn from() {
+        assert_eq!(
+            DualQuaternion::<i32>::from(-3),
+            DualQuaternion::new(
+                Quaternion::new(Vector::new(0, 0, 0), -3),
+                Quaternion::new(Vector::new(0, 0, 0), 0),
+            )
+        );
+        assert_eq!(
+            DualQuaternion::<f64>::from(3.3),
+            DualQuaternion::new(
+                Quaternion::new(Vector::new(0.0, 0.0, 0.0), 3.3),
+                Quaternion::new(Vector::new(0.0, 0.0, 0.0), 0.0),
+            )
+        );
+    }
 
     #[test]
     fn add() {
