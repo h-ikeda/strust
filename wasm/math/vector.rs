@@ -26,7 +26,6 @@ where
 
 impl<T> Vector<T>
 where
-    for<'a> &'a T: Mul<Output = T> + Add<Output = T>,
     T: Hypot,
 {
     pub fn abs(&self) -> T {
@@ -36,7 +35,7 @@ where
 
 impl<T> Vector<T>
 where
-    for<'a> &'a T: Mul<Output = T> + Add<Output = T> + Div<Output = T>,
+    for<'a> &'a T: Div<Output = T>,
     T: Hypot,
 {
     pub fn normalized(&self) -> Self {
