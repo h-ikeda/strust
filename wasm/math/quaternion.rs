@@ -4,7 +4,7 @@ use super::{
 };
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub struct Quaternion<T> {
     pub v: Vector<T>,
     pub w: T,
@@ -18,11 +18,11 @@ impl<T> Quaternion<T> {
 
 impl<T> From<T> for Quaternion<T>
 where
-    T: From<u8>,
+    T: Default,
 {
     fn from(value: T) -> Self {
         Self {
-            v: Vector::new(T::from(0), T::from(0), T::from(0)),
+            v: Vector::default(),
             w: value,
         }
     }
@@ -257,11 +257,11 @@ mod tests {
     #[test]
     fn from() {
         assert_eq!(
-            Quaternion::<i32>::from(-3),
+            Quaternion::from(-3),
             Quaternion::new(Vector::new(0, 0, 0), -3)
         );
         assert_eq!(
-            Quaternion::<f64>::from(3.3),
+            Quaternion::from(3.3),
             Quaternion::new(Vector::new(0.0, 0.0, 0.0), 3.3)
         );
     }
@@ -515,6 +515,18 @@ mod tests {
         assert_eq!(
             Quaternion::from_translation(&Vector::new(0.8, 3.2, -1.4)),
             Quaternion::new(Vector::new(0.8, 3.2, -1.4), 0.0),
+        );
+    }
+
+    #[test]
+    fn default() {
+        assert_eq!(
+            Quaternion::default(),
+            Quaternion::new(Vector::new(0, 0, 0), 0)
+        );
+        assert_eq!(
+            Quaternion::default(),
+            Quaternion::new(Vector::new(0.0, 0.0, 0.0), 0.0)
         );
     }
 }
