@@ -75,7 +75,6 @@ where
 
 impl<T> Quaternion<T>
 where
-    for<'a> &'a T: Add<Output = T> + Mul<Output = T>,
     T: Hypot,
 {
     pub fn abs(&self) -> T {
@@ -85,7 +84,7 @@ where
 
 impl<T> Quaternion<T>
 where
-    for<'a> &'a T: Add<Output = T> + Mul<Output = T> + Div<Output = T>,
+    for<'a> &'a T: Div<Output = T>,
     T: Hypot,
 {
     pub fn normalized(&self) -> Self {
