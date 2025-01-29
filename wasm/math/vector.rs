@@ -2,7 +2,7 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssi
 
 use super::traits::Hypot;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub struct Vector<T> {
     pub x: T,
     pub y: T,
@@ -473,5 +473,11 @@ mod tests {
                 11.3 / (20.4 as f32).hypot(3.8).hypot(11.3)
             )
         );
+    }
+
+    #[test]
+    fn default() {
+        assert_eq!(Vector::default(), Vector::new(0.0, 0.0, 0.0));
+        assert_eq!(Vector::default(), Vector::new(0, 0, 0));
     }
 }
