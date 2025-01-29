@@ -16,6 +16,18 @@ impl<T> Quaternion<T> {
     }
 }
 
+impl<T> From<T> for Quaternion<T>
+where
+    T: From<u8>,
+{
+    fn from(value: T) -> Self {
+        Self {
+            v: Vector::new(T::from(0), T::from(0), T::from(0)),
+            w: value,
+        }
+    }
+}
+
 impl<T> Quaternion<T>
 where
     T: From<u8> + Sin + Cos + Hypot + PartialOrd,
@@ -241,6 +253,18 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn from() {
+        assert_eq!(
+            Quaternion::<i32>::from(-3),
+            Quaternion::new(Vector::new(0, 0, 0), -3)
+        );
+        assert_eq!(
+            Quaternion::<f64>::from(3.3),
+            Quaternion::new(Vector::new(0.0, 0.0, 0.0), 3.3)
+        );
+    }
 
     #[test]
     fn add() {

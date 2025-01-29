@@ -14,6 +14,18 @@ impl<T> Complex<T> {
     }
 }
 
+impl<T> From<T> for Complex<T>
+where
+    T: From<u8>,
+{
+    fn from(value: T) -> Self {
+        Self {
+            re: value,
+            im: T::from(0),
+        }
+    }
+}
+
 impl<T> Complex<T>
 where
     T: Hypot,
@@ -283,6 +295,12 @@ mod tests {
     use core::{f32, f64};
 
     use super::*;
+
+    #[test]
+    fn from() {
+        assert_eq!(Complex::<i32>::from(-3), Complex::new(-3, 0));
+        assert_eq!(Complex::<f64>::from(3.3), Complex::new(3.3, 0.0));
+    }
 
     #[test]
     fn abs() {
