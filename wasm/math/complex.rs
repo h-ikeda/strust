@@ -2,7 +2,7 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssi
 
 use super::traits::{Atan2, Cos, Exp, Hypot, Ln, Sin};
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub struct Complex<T> {
     pub re: T,
     pub im: T,
@@ -11,6 +11,18 @@ pub struct Complex<T> {
 impl<T> Complex<T> {
     pub fn new(re: T, im: T) -> Self {
         Self { re, im }
+    }
+}
+
+impl<T> From<T> for Complex<T>
+where
+    T: Default,
+{
+    fn from(value: T) -> Self {
+        Self {
+            re: value,
+            im: T::default(),
+        }
     }
 }
 
@@ -283,6 +295,12 @@ mod tests {
     use core::{f32, f64};
 
     use super::*;
+
+    #[test]
+    fn from() {
+        assert_eq!(Complex::from(-3), Complex::new(-3, 0));
+        assert_eq!(Complex::from(3.3), Complex::new(3.3, 0.0));
+    }
 
     #[test]
     fn abs() {
@@ -559,5 +577,11 @@ mod tests {
                         .sin(),
             ),
         );
+    }
+
+    #[test]
+    fn default() {
+        assert_eq!(Complex::default(), Complex::new(0.0, 0.0));
+        assert_eq!(Complex::default(), Complex::new(0, 0));
     }
 }

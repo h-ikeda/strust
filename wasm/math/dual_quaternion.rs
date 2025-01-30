@@ -5,7 +5,7 @@ use super::{
 };
 use std::ops::{Add, AddAssign, Div, Mul, MulAssign, Neg, Sub, SubAssign};
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub struct DualQuaternion<T> {
     pub p: Quaternion<T>,
     pub q: Quaternion<T>,
@@ -14,6 +14,18 @@ pub struct DualQuaternion<T> {
 impl<T> DualQuaternion<T> {
     pub const fn new(p: Quaternion<T>, q: Quaternion<T>) -> Self {
         Self { p, q }
+    }
+}
+
+impl<T> From<T> for DualQuaternion<T>
+where
+    T: Default,
+{
+    fn from(value: T) -> Self {
+        Self {
+            p: value.into(),
+            ..Default::default()
+        }
     }
 }
 
@@ -208,6 +220,24 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn from() {
+        assert_eq!(
+            DualQuaternion::from(-3),
+            DualQuaternion::new(
+                Quaternion::new(Vector::new(0, 0, 0), -3),
+                Quaternion::new(Vector::new(0, 0, 0), 0),
+            )
+        );
+        assert_eq!(
+            DualQuaternion::from(3.3),
+            DualQuaternion::new(
+                Quaternion::new(Vector::new(0.0, 0.0, 0.0), 3.3),
+                Quaternion::new(Vector::new(0.0, 0.0, 0.0), 0.0),
+            )
+        );
+    }
 
     #[test]
     fn add() {
@@ -614,5 +644,23 @@ mod tests {
         assert!((b.translation().x - 32.8).abs() < f64::EPSILON * 32.8);
         assert!((b.translation().y + 6.35).abs() < f64::EPSILON * 6.35);
         assert!((b.translation().z + 9.97).abs() < f64::EPSILON * 9.97);
+    }
+
+    #[test]
+    fn default() {
+        assert_eq!(
+            DualQuaternion::default(),
+            DualQuaternion::new(
+                Quaternion::new(Vector::new(0, 0, 0), 0),
+                Quaternion::new(Vector::new(0, 0, 0), 0)
+            )
+        );
+        assert_eq!(
+            DualQuaternion::default(),
+            DualQuaternion::new(
+                Quaternion::new(Vector::new(0.0, 0.0, 0.0), 0.0),
+                Quaternion::new(Vector::new(0.0, 0.0, 0.0), 0.0)
+            )
+        );
     }
 }
