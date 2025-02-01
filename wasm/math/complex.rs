@@ -290,6 +290,19 @@ where
     }
 }
 
+impl<T> Neg for &Complex<T>
+where
+    for<'a> &'a T: Neg<Output = T>,
+{
+    type Output = Complex<T>;
+    fn neg(self) -> Self::Output {
+        Self::Output {
+            re: -&self.re,
+            im: -&self.im,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use core::{f32, f64};
@@ -583,5 +596,11 @@ mod tests {
     fn default() {
         assert_eq!(Complex::default(), Complex::new(0.0, 0.0));
         assert_eq!(Complex::default(), Complex::new(0, 0));
+    }
+
+    #[test]
+    fn neg() {
+        assert_eq!(-&Complex::new(72, 369), Complex::new(-72, -369));
+        assert_eq!(-&Complex::new(56.3, -33.8), Complex::new(-56.3, 33.8));
     }
 }
