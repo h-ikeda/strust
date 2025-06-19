@@ -31,7 +31,7 @@
     "vite": "^6.3.5",
     "vue": "^3.5.17",
     "vue-router": "^4.5.1",
-    "vuetify": "^3.8.9",
+    "vuetify": "^3.8.10",
     "wasm-pack": "^0.13.1"
   },
   "imports": {
