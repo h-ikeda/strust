@@ -1,5 +1,4 @@
-mod geometry;
-mod math;
+mod model;
 
 use wasm_bindgen::prelude::*;
 
