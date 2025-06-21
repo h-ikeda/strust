@@ -7,6 +7,8 @@ pub trait Section {
     fn product_of_inertia(&self) -> Float;
 }
 
+/// Calculates the principal axis direction of the section.
+/// Returns the angle of axis in radians.
 pub fn principal_axis(section: impl Section) -> Float {
     let area = section.area();
     let center = section.centroid();
