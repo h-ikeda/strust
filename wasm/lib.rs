@@ -3,8 +3,10 @@ mod math;
 
 use wasm_bindgen::prelude::*;
 
+type Float = f64;
+
 #[wasm_bindgen]
-pub fn multiply(left: f64, right: f64) -> f64 {
+pub fn multiply(left: Float, right: Float) -> Float {
     left * right
 }
 
