@@ -20,6 +20,7 @@ pub fn principal_axis(section: impl Section) -> Float {
     (ixy * -2.0).atan2(i[1] - i[0]) * 0.5
 }
 
+pub mod circle;
 pub mod rectangle;
 
 #[cfg(test)]
