@@ -22,6 +22,7 @@ pub fn principal_axis(section: impl Section) -> Float {
 
 pub mod circle;
 pub mod rectangle;
+pub mod translated;
 
 #[cfg(test)]
 mod tests {
