@@ -21,17 +21,17 @@
   },
   "homepage": "https://github.com/h-ikeda/strust#readme",
   "devDependencies": {
-    "@eslint/js": "^9.29.0",
+    "@eslint/js": "^9.30.0",
     "@rollup/plugin-wasm": "^6.2.2",
-    "@vitejs/plugin-vue": "^5.2.4",
-    "eslint": "^9.29.0",
+    "@vitejs/plugin-vue": "^6.0.0",
+    "eslint": "^9.30.0",
     "eslint-plugin-vue": "^10.2.0",
     "sass-embedded": "^1.89.2",
-    "typescript-eslint": "^8.34.1",
-    "vite": "^6.3.5",
+    "typescript-eslint": "^8.35.1",
+    "vite": "^7.0.0",
     "vue": "^3.5.17",
     "vue-router": "^4.5.1",
-    "vuetify": "^3.8.10",
+    "vuetify": "^3.8.11",
     "wasm-pack": "^0.13.1"
   },
   "imports": {
