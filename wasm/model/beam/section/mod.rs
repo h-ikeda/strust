@@ -18,6 +18,7 @@ pub mod circle;
 pub mod rectangle;
 pub mod rotated;
 pub mod translated;
+pub mod weighted;
 
 #[cfg(test)]
 mod tests {
