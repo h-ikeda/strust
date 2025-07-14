@@ -15,6 +15,7 @@ pub fn principal_axis(section: impl Section) -> Float {
 }
 
 pub mod circle;
+pub mod combined;
 pub mod rectangle;
 pub mod rotated;
 pub mod translated;
