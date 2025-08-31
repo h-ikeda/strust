@@ -7,14 +7,12 @@
 	"features": {
 		"ghcr.io/devcontainers/features/git:1": {},
 		"ghcr.io/devcontainers/features/rust:1": {},
-		"ghcr.io/devcontainers/features/node:1": {},
 		"ghcr.io/kreemer/features/chrometesting:1": {}
 	},
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"rust-lang.rust-analyzer",
-				"Vue.volar"
+				"rust-lang.rust-analyzer"
 			]
 		}
 	},
@@ -26,7 +24,7 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "npm ci"
+	"postCreateCommand": "cargo install --locked trunk"
 
 	// Configure tool-specific properties.
 	// "customizations": {},
